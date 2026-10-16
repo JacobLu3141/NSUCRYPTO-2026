@@ -1,0 +1,16 @@
+# Whitelist: only PDFs in the base folder are tracked.
+# Everything else (LaTeX sources, build artifacts, compute folders) is ignored.
+
+# Ignore everything
+*
+
+# also the working folder for Q3 -(by Ryan)
+/bsw-volunteer-dist (2)
+# ...except directories, so git can look inside them
+!*/
+
+# Allow only PDFs in the base folder
+!/*.pdf
+
+# Allow this file itself
+!.gitignore
