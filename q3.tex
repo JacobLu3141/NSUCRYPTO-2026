@@ -1,0 +1,690 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{hyperref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\theoremstyle{remark}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\GF}{\mathrm{GF}}
+\newcommand{\PG}{\mathrm{PG}}
+\newcommand{\PGL}{\mathrm{PGL}}
+\newcommand{\cro}{\mathrm{cr}}
+\newcommand{\QMAX}{1050}
+
+\title{NSUCRYPTO 2026, Round 2\\Problem 3: The BSW Conjecture}
+\date{}
+
+\begin{document}
+\maketitle
+
+\section*{Summary}
+
+We prove Conjecture~1 for finitely many values of $q$ (the third option in the task), and add two structural
+results toward the general case: a stability theorem, and an exact reduction of the open case to a single
+``sign'' property of triples.
+
+\begin{theorem}[computer-assisted]\label{thm:main}
+Conjecture~1 holds for every prime power $q\equiv 3\pmod 4$ with $31<q\le \QMAX$.
+\end{theorem}
+
+Blokhuis, Seress and Wilbrink report that A.~Brouwer checked $43\le q\le131$ by computer \cite[\S3]{BSW}.
+Theorem~\ref{thm:main} extends this to $q\le\QMAX$, which includes the prime powers $243=3^5$ and $343=7^3$. The
+computation reproduces the known small cases: for each $q\in\{7,11,19,23,27,31\}$ there are partitions that are
+not of the form $n/x$, so the hypothesis $q>31$ cannot be weakened. This is the list in \cite[\S3]{BSW}, and for
+prime $q$ the number of configurations up to $\PGL(2,q)$ (namely $1,2,1,2,1$ for $q=7,11,19,23,31$) also agrees
+with theirs. Table~\ref{tab:small} gives the exact counts for $q\le31$.
+
+\begin{theorem}[stability; all odd $q\ge5$]\label{thm:stab}
+Let $\psi$ satisfy the hypotheses of Conjecture~1 for some odd prime power $q\ge 5$, and let $n$ be a nonsquare.
+If $x\psi(x)=n$ holds for more than $(q-7+2\sqrt q)/2$ elements $x\in\GF(q)^*$, then $x\psi(x)=n$ for all
+$x\in\GF(q)^*$. More generally, see Theorem~\ref{thm:stab2}: a ``BSW partition'' that shares more than
+$(q-3+2\sqrt q)/4$ pairs with the orbits of an elliptic involution is equal to that orbit partition.
+\end{theorem}
+
+The threshold of Theorem~\ref{thm:stab2} is attained: for $q=7,11,19$ there are non-standard BSW partitions sharing
+$\lfloor(q-3+2\sqrt q)/4\rfloor$ pairs with an elliptic involution (Section~\ref{sec:stats}).
+
+Theorem~\ref{thm:stab} reduces Conjecture~1 to showing that some $n$ satisfies $x\psi(x)=n$ for roughly
+half of all $x\in\GF(q)^*$.
+
+\begin{theorem}[reduction; all $q\equiv3\pmod4$]\label{thm:red}
+Let $q\equiv 3\pmod 4$ and let $\psi$ satisfy the hypotheses of Conjecture~1. Then $\psi(x)=n/x$ for some
+nonsquare $n$ if and only if
+\begin{equation}\label{eq:E}
+\chi\bigl((s-t)(\psi(s)-\psi(t))\bigr)=1\qquad\text{for all nonzero squares } s\neq t .
+\end{equation}
+More symmetrically (Theorem~\ref{thm:red2}): every compatible triple of pairs has a sign $\pm1$ that is symmetric
+and $\PGL(2,q)$-invariant, and a BSW partition is standard if and only if all of its triples are positive, if
+and only if all triples through one of its pairs are positive. In particular, a BSW partition with fewer than
+$(q+1)/6$ negative triples is standard.
+\end{theorem}
+
+The ``if'' direction adapts the first half of the proof of \cite{BSW} for $q\equiv1\pmod 4$. Their second half
+proves the analogue of \eqref{eq:E} by a parity count in the Paley graph. For $q\equiv3\pmod4$ the same count
+in the Paley tournament is valid but gives no information (Section~\ref{sec:failed}). Condition \eqref{eq:E} is
+therefore exactly what remains open. We could not prove it; Section~\ref{sec:failed} lists the approaches that
+failed.
+
+\section{Notation and reformulation}
+
+Throughout, $q$ is an odd prime power, $\chi$ is the quadratic character of $\GF(q)$, and
+$\PG(1,q)=\GF(q)\cup\{\infty\}$. A point is written in homogeneous coordinates $x=(x_1:x_2)$, with
+$a\in\GF(q)$ identified with $(a:1)$ and $\infty=(1:0)$. Put $[x,y]=x_1y_2-x_2y_1$. Then $[a,b]=a-b$ for finite
+$a,b$, and $[\infty,b]=1$, $[a,\infty]=-1$.
+
+\begin{definition}
+For two disjoint $2$-subsets $P=\{a,a'\}$ and $Q=\{b,b'\}$ of $\PG(1,q)$ put
+\[
+  \cro(P,Q)=\frac{[a,b]\,[a',b']}{[a,b']\,[a',b]}\in\GF(q)^* .
+\]
+Each of $a,a',b,b'$ occurs once in the numerator and once in the denominator, so $\cro$ does not depend on the
+choice of homogeneous coordinates. Swapping $a\leftrightarrow a'$ or $b\leftrightarrow b'$ replaces $\cro$ by
+$1/\cro$, and swapping $P\leftrightarrow Q$ leaves it unchanged (each bracket changes sign, and there are two
+in the numerator and two in the denominator). Hence $\chi(\cro(P,Q))$ and the \emph{class}
+$\{\cro,\cro^{-1}\}$ of the unordered configuration $\{P,Q\}$ are well defined. We call $P,Q$
+\emph{compatible} if $\chi(\cro(P,Q))=-1$.
+
+A \emph{BSW partition} is a partition $\Pi$ of $\PG(1,q)$ into $(q+1)/2$ pairs, any two of which are
+compatible. It is \emph{standard} if it is the set of orbits of a fixed-point-free involution in $\PGL(2,q)$.
+\end{definition}
+
+Since $[a,b][a',b'][a,b'][a',b]=\cro(P,Q)\cdot([a,b'][a',b])^2$, we have
+\begin{equation}\label{eq:prod}
+  \chi\bigl([a,b][a,b'][a',b][a',b']\bigr)=\chi(\cro(P,Q)).
+\end{equation}
+
+\begin{lemma}\label{lem:dict}
+Let $\psi:\GF(q)^*\to\GF(q)^*$ be a fixed-point-free involution, and let
+$\Pi_\psi=\{\{0,\infty\}\}\cup\{\{x,\psi(x)\}:x\in\GF(q)^*\}$. Then
+\begin{enumerate}
+\item[(i)] $\psi$ satisfies the hypotheses of Conjecture~1 if and only if $\Pi_\psi$ is a BSW partition;
+\item[(ii)] $\psi(x)=n/x$ for a nonsquare $n$ if and only if $\Pi_\psi$ is standard.
+\end{enumerate}
+Every BSW partition containing the pair $\{0,\infty\}$ is $\Pi_\psi$ for exactly one such $\psi$.
+\end{lemma}
+
+\begin{proof}
+(i) We have $\cro(\{0,\infty\},\{x,x'\})=\dfrac{[0,x][\infty,x']}{[0,x'][\infty,x]}=\dfrac{x}{x'}$, and
+$\chi(x/x')=\chi(xx')$. So compatibility of $\{0,\infty\}$ with every other pair is exactly the requirement
+$\chi(\psi(x))=-\chi(x)$. For $x,y\in\GF(q)^*$ with $y\notin\{x,\psi x\}$, the pairs $\{x,\psi x\}$ and
+$\{y,\psi y\}$ are disjoint, and by \eqref{eq:prod} their compatibility is exactly the displayed condition of
+Conjecture~1. The last sentence is clear: the pairs other than $\{0,\infty\}$ partition $\GF(q)^*$.
+
+(ii) If $\psi(x)=n/x$ with $n$ a nonsquare, then $\sigma(x)=n/x$ (with $0\leftrightarrow\infty$) lies in
+$\PGL(2,q)$. It is an involution, and it has no fixed point since $x^2=n$ has no solution. Its orbits form
+$\Pi_\psi$. Conversely, let $\Pi_\psi$ be the orbit set of a fixed-point-free involution $\sigma(x)=(ax+b)/(cx+d)$.
+Then $\sigma$ swaps $0$ and $\infty$. From $\sigma(0)=\infty$ we get $d=0$, and from $\sigma(\infty)=0$ we get
+$a=0$. So $\sigma(x)=n/x$ with $n=b/c$, and $n$ is a nonsquare because $\sigma$ has no fixed point.
+\end{proof}
+
+\begin{lemma}\label{lem:stdbsw}
+For every nonsquare $n$, the orbit set of $\sigma(x)=n/x$ is a BSW partition. Hence every standard partition
+is a BSW partition.
+\end{lemma}
+
+\begin{proof}
+The pair $\{0,\infty\}$ is compatible with $\{x,n/x\}$ because $\chi(x\cdot n/x)=\chi(n)=-1$. For two distinct finite
+orbits $\{x,n/x\}$ and $\{y,n/y\}$, direct expansion gives
+\[
+(x-y)\Bigl(x-\frac ny\Bigr)\Bigl(\frac nx-y\Bigr)\Bigl(\frac nx-\frac ny\Bigr)
+=n\left(\frac{(x-y)(xy-n)}{xy}\right)^{2},
+\]
+which is nonzero because the orbits are disjoint. Its character is $\chi(n)=-1$. By \eqref{eq:prod} the two
+orbits are compatible. A standard partition is the orbit set of $g\sigma g^{-1}$ for some $g\in\PGL(2,q)$ and
+some $\sigma$ as above: move one orbit to $\{0,\infty\}$ and apply Lemma~\ref{lem:dict}(ii). So it is BSW by
+Lemma~\ref{lem:pgl}(i) below.
+\end{proof}
+
+\begin{lemma}\label{lem:pgl}
+Let $g\in\PGL(2,q)$.
+\begin{enumerate}
+\item[(i)] $\cro(gP,gQ)=\cro(P,Q)$. Hence $g\Pi$ is a BSW partition if and only if $\Pi$ is, and $g$ maps
+standard partitions to standard partitions.
+\item[(ii)] If two unordered configurations $\{P,Q\}$ and $\{P',Q'\}$ of disjoint pairs have the same class,
+then some $h\in\PGL(2,q)$ maps $\{P,Q\}$ to $\{P',Q'\}$.
+\item[(iii)] For disjoint pairs $P,Q$, at most one involution of $\PGL(2,q)$ has both $P$ and $Q$ among its orbits.
+\end{enumerate}
+\end{lemma}
+
+\begin{proof}
+(i) For $g$ represented by a matrix $M$, $[Mx,My]=\det(M)[x,y]$. The factors $\det M$ cancel in $\cro$. If
+$\Pi$ is the orbit set of $\sigma$, then $g\Pi$ is the orbit set of $g\sigma g^{-1}$, which is again a
+fixed-point-free involution.
+
+(ii) Write $P=\{a,a'\}$, $Q=\{b,b'\}$, $P'=\{\alpha,\alpha'\}$, $Q'=\{\beta,\beta'\}$. Relabelling within $P'$
+if necessary, we may assume $\cro(P,Q)=\cro(P',Q')$, computed with these labels. $\PGL(2,q)$ is sharply
+$3$-transitive on $\PG(1,q)$, so there is a unique $h$ with $h(a)=\alpha$, $h(a')=\alpha'$, $h(b)=\beta$. By
+(i), $\cro(\{\alpha,\alpha'\},\{\beta,h(b')\})=\cro(\{\alpha,\alpha'\},\{\beta,\beta'\})$. For fixed distinct
+$\alpha,\alpha',\beta$, the map $y\mapsto [\alpha,\beta][\alpha',y]/([\alpha,y][\alpha',\beta])$ is injective
+on $\PG(1,q)\setminus\{\alpha,\alpha',\beta\}$: it is a M\"obius transformation in $y$ with nonzero determinant
+$[\alpha,\beta][\alpha',\beta]\cdot[\alpha,\alpha']$ up to a nonzero scalar factor. Hence $h(b')=\beta'$.
+
+(iii) If $\sigma,\sigma'$ are two such involutions, then $\sigma\sigma'$ fixes $a$, $a'$ and $b$, so it is the
+identity and $\sigma=\sigma'^{-1}=\sigma'$.
+\end{proof}
+
+\begin{lemma}\label{lem:classes}
+Let $q\equiv3\pmod4$ and let $g$ be a primitive element of $\GF(q)$. The class of every compatible
+configuration is $\{g^L,g^{-L}\}$ for a unique odd \emph{key} $L\in\{1,3,\dots,(q-1)/2\}$. The class of $\{\{0,\infty\},\{1,g^L\}\}$ has key $L$.
+In a standard partition, the configurations formed with $\{0,\infty\}$ realise every key.
+\end{lemma}
+
+\begin{proof}
+A nonsquare $c$ is $g^{L}$ with $L$ odd, $0<L<q-1$, and $c^{-1}=g^{q-1-L}$. Since $q-1\equiv2\pmod4$,
+$q-1-L$ is also odd. If $L\ne(q-1)/2$, exactly one of $L$ and $q-1-L$ is less than $(q-1)/2$; if $L=(q-1)/2$, i.e.\
+$c=-1$, both equal $(q-1)/2$. So $\min(L,q-1-L)$ is the unique key. By the computation in the proof of Lemma~\ref{lem:dict}(i), $\cro(\{0,\infty\},\{1,g^L\})=g^{-L}$. In the standard
+partition of $x\mapsto n/x$ we get $\cro(\{0,\infty\},\{x,n/x\})=x^2/n$, which runs over all nonsquares as
+$x$ runs over $\GF(q)^*$.
+\end{proof}
+
+\section{A stability theorem}
+
+\begin{lemma}\label{lem:hasse}
+Let $q$ be odd and $F\in\GF(q)[X]$ monic of degree $4$ with four distinct roots in $\GF(q)$. Then
+$T=\sum_{x\in\GF(q)}\chi(F(x))$ satisfies $|T+1|\le2\sqrt q$.
+\end{lemma}
+
+\begin{proof}
+Write $F(X)=(X-r)(X-r_2)(X-r_3)(X-r_4)$. The map $u\mapsto r+1/u$ is a bijection from $\GF(q)^*$ onto
+$\GF(q)\setminus\{r\}$, and $F(r+1/u)=u^{-4}G(u)$ with $G(U)=\prod_{i=2}^4\bigl((r-r_i)U+1\bigr)$. As $u^{-4}$ is a
+nonzero square, $F(r)=0$ and $G(0)=1$, we get $T=\sum_{u\ne0}\chi(G(u))=\sum_{u\in\GF(q)}\chi(G(u))-1$. The cubic $G$ has
+leading coefficient $c=\prod_i(r-r_i)\ne0$ and distinct roots $-1/(r-r_i)$, so $H(V)=c^2G(V/c)$ is a monic cubic with
+distinct roots and $\chi(H(cu))=\chi(G(u))$. Since $q$ is odd, $y^2=H(v)$ is an elliptic curve $E$, and
+$\#E(\GF(q))=1+\sum_v(1+\chi(H(v)))=q+1+\sum_v\chi(H(v))$. Hasse's theorem \cite[Theorem~V.1.1]{Silverman}
+gives $|\sum_v\chi(H(v))|\le2\sqrt q$, and $\sum_v\chi(H(v))=\sum_u\chi(G(u))=T+1$.
+\end{proof}
+
+\begin{theorem}\label{thm:stab2}
+Let $q\ge5$ be an odd prime power, $\Pi$ a BSW partition of $\PG(1,q)$, and $\sigma\in\PGL(2,q)$ a
+fixed-point-free involution. If more than $(q-3+2\sqrt q)/4$ pairs of $\Pi$ are orbits of $\sigma$, then $\Pi$ is
+the orbit set of $\sigma$.
+\end{theorem}
+
+\begin{proof}
+Suppose some $\ell\in\Pi$ is not a $\sigma$-orbit. The $\sigma$-orbits partition $\PG(1,q)$ into
+$(q+1)/2\ge3$ pairs, and $\ell$ meets at most two of them, so some $\sigma$-orbit $O$ is disjoint from $\ell$.
+Choose $h\in\PGL(2,q)$ with $h(O)=\{0,\infty\}$ (possible by $2$-transitivity). Replace $\Pi,\sigma,\ell$ by
+$h\Pi$, $h\sigma h^{-1}$, $h\ell$. By Lemma~\ref{lem:pgl}(i) the hypotheses and the conclusion are unchanged.
+Now $\sigma$ swaps $0$ and $\infty$, so, as in the proof of Lemma~\ref{lem:dict}(ii), $\sigma(x)=n/x$ with $n$ a
+nonsquare. Also $\ell=\{b,b'\}$ with $b,b'\in\GF(q)^*$ distinct, and $bb'\ne n$ because $\ell$ is not a
+$\sigma$-orbit.
+
+Every $\sigma$-orbit lying in $\Pi$ is disjoint from $\ell$ and compatible with it. We count the
+$\sigma$-orbits with these two properties; the orbit $\{0,\infty\}$ is treated below. For $x\in\GF(q)^*$ with
+$\{x,n/x\}\cap\{b,b'\}=\emptyset$, equation \eqref{eq:prod} gives
+\[
+\chi\bigl(\cro(\ell,\{x,n/x\})\bigr)=\chi\bigl((x-b)(x-b')(\tfrac nx-b)(\tfrac nx-b')\bigr)
+=\chi(bb')\,\chi(F(x)),
+\]
+where $F(X)=(X-b)(X-b')(X-n/b)(X-n/b')$. Here we used $(\tfrac nx-b)(\tfrac nx-b')=\tfrac{bb'}{x^2}
+(x-\tfrac nb)(x-\tfrac n{b'})$. The four roots of $F$ are distinct: $b\ne b'$; $b=n/b$ would give $b^2=n$, which
+is impossible; $b=n/b'$ would give $bb'=n$, which is excluded; the same holds with $b,b'$ exchanged; and
+$n/b\ne n/b'$. All four roots are nonzero. The condition
+$\{x,n/x\}\cap\{b,b'\}=\emptyset$ says exactly that $F(x)\neq0$.
+
+Let $M$ be the number of $x\in\GF(q)^*$ with $F(x)\ne0$ and $\chi(F(x))=-\chi(bb')$. Each compatible orbit
+$\{x,n/x\}$ with $x\neq0$ contributes exactly two such $x$, since $x\ne n/x$. Hence the number of compatible
+finite orbits is $M/2$. Since $F(0)=n^2\ne0$ and $\chi(F(0))=1$,
+\[
+M=\sum_{\substack{x\in\GF(q)^*\\F(x)\neq0}}\frac{1-\chi(bb')\chi(F(x))}{2}
+=\frac12\Bigl((q-5)-\chi(bb')\bigl(T-1\bigr)\Bigr),\qquad T=\sum_{x\in\GF(q)}\chi(F(x)).
+\]
+The orbit $\{0,\infty\}$ is compatible with $\ell$ iff $\chi(bb')=-1$, since $\cro(\{0,\infty\},\ell)=b/b'$. So the number
+$N$ of $\sigma$-orbits disjoint from and compatible with $\ell$ is $N=M/2=(q-4-T)/4$ if $\chi(bb')=1$, and
+$N=1+M/2=(q-2+T)/4$ if $\chi(bb')=-1$. By Lemma~\ref{lem:hasse}, $-1-2\sqrt q\le T\le2\sqrt q-1$, so in both
+cases $N\le(q-3+2\sqrt q)/4$. At most $N$ orbits of $\sigma$ lie in $\Pi$, contrary to the hypothesis.
+
+So every pair of $\Pi$ is a $\sigma$-orbit. Both partitions consist of $(q+1)/2$ pairs, so they are equal.
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:stab}]
+Let $\Pi=\Pi_\psi$ and $\sigma(x)=n/x$. A pair $\{x,\psi x\}$ is a $\sigma$-orbit iff $x\psi(x)=n$, and each
+such pair accounts for two elements $x$. The pair $\{0,\infty\}$ is also a common orbit. If more than
+$(q-7+2\sqrt q)/2$ elements satisfy $x\psi(x)=n$, then $\Pi$ and the orbit set of $\sigma$ share more than
+$(q-3+2\sqrt q)/4$ pairs, and Theorem~\ref{thm:stab2} finishes the proof.
+\end{proof}
+
+\section{A reduction for $q\equiv3\pmod 4$}\label{sec:red}
+
+Throughout this section $q\equiv3\pmod4$, so $\chi(-1)=-1$ and $q=p^m$ with $m$ odd (an even power of an odd prime is
+$\equiv1\pmod 4$).
+
+\begin{definition}
+A \emph{compatible triple} is a set $\{R,P,Q\}$ of three pairwise disjoint, pairwise compatible pairs. Choose
+$g\in\PGL(2,q)$ with $gR=\{0,\infty\}$. By Lemma~\ref{lem:pgl}(i), $gP$ and $gQ$ are compatible with $\{0,\infty\}$, so
+by the computation $\cro(\{0,\infty\},\{x,x'\})=x/x'$ in the proof of Lemma~\ref{lem:dict}(i) each of them consists of a nonzero square
+and a nonsquare (none of the points is $0$ or $\infty$, by disjointness). Write $gP=\{s,s'\}$ and $gQ=\{t,t'\}$ with
+$s,t$ squares, and put
+\[
+\varepsilon(R;P,Q)=\chi\bigl((s-t)(s'-t')\bigr)\in\{\pm1\}.
+\]
+($s\neq t$ and $s'\ne t'$ because $gP\cap gQ=\emptyset$.)
+\end{definition}
+
+\begin{lemma}\label{lem:eps}
+$\varepsilon(R;P,Q)$ does not depend on the choice of $g$, it is $\PGL(2,q)$-invariant, and it is symmetric in
+$R,P,Q$. We write $\varepsilon(R,P,Q)$ and call the triple \emph{positive} or \emph{negative}.
+\end{lemma}
+
+\begin{proof}
+\emph{Independence of $g$.} Any other choice is $hg$ with $h$ in the stabiliser of $\{0,\infty\}$, i.e.\
+$h(x)=\lambda x$ or $h(x)=\lambda/x$ with $\lambda\ne0$. If $h(x)=\lambda x$ with $\lambda$ a square, the labels are
+kept and the product is multiplied by $\lambda^2$. If $\lambda$ is a nonsquare, $h$ swaps squares and nonsquares, so
+the new square points are $\lambda s',\lambda t'$; the product $(\lambda s'-\lambda t')(\lambda s-\lambda t)$ is again
+$\lambda^2(s-t)(s'-t')$. If $h(x)=\lambda/x$ with $\lambda$ a square, the labels are kept (as $\chi(\lambda/x)=\chi(x)$)
+and $(\tfrac\lambda s-\tfrac\lambda t)(\tfrac\lambda{s'}-\tfrac\lambda{t'})=\lambda^2\frac{(s-t)(s'-t')}{st\,s't'}$, where
+$\chi(st)=\chi(s't')=1$. If $\lambda$ is a nonsquare, the labels swap and the same product appears. In all cases
+$\chi$ of the product is unchanged. Invariance under $k\in\PGL(2,q)$ follows by using $gk^{-1}$ for $kR$.
+
+\emph{Symmetry.} Swapping $P$ and $Q$ swaps $(s,s')$ with $(t,t')$, which does not change $(s-t)(s'-t')$. It remains
+to show $\varepsilon(R;P,Q)=\varepsilon(P;R,Q)$; the two transpositions generate $S_3$. Take $R=\{0,\infty\}$,
+$P=\{s,s'\}$, $Q=\{t,t'\}$ as above. The map $g(x)=(x-s)/(x-s')$ lies in $\PGL(2,q)$ and sends $P$ to $\{0,\infty\}$,
+$\infty\mapsto1$ (a square) and $0\mapsto s/s'$ (a nonsquare). Hence $\varepsilon(P;R,Q)=\chi((1-u)(s/s'-u'))$, where
+$u$ is the square and $u'$ the nonsquare among $g(t),g(t')$. Direct computation gives
+\[
+1-g(y)=\frac{s-s'}{y-s'},\qquad \frac{s}{s'}-g(y)=\frac{y(s-s')}{s'(y-s')}\qquad(y\in\{t,t'\}).
+\]
+Recall $\chi(g(y))=\chi((y-s)(y-s'))$, and by compatibility of $P,Q$ exactly one of $g(t),g(t')$ is a square.
+
+\emph{Case A: $g(t)$ is a square.} Then
+$\varepsilon(P;R,Q)=\chi\bigl(\frac{(s-s')^2\,t'}{s'(t-s')(t'-s')}\bigr)=\chi(t's')\,\chi\bigl((t-s')(t'-s')\bigr)
+=\chi\bigl((t-s')(t'-s')\bigr)$, since $t',s'$ are nonsquares. Comparing with
+$\varepsilon(R;P,Q)=\chi((s-t)(s'-t'))$, the ratio is
+$\chi\bigl((t-s')(s-t)\bigr)\chi\bigl((t'-s')(s'-t')\bigr)=\chi\bigl((t-s')(s-t)\bigr)\cdot\chi(-1)$. In Case A,
+$\chi((t-s)(t-s'))=1$, so $\chi((s-t)(t-s'))=\chi(-1)=-1$, and the ratio is $(-1)(-1)=1$.
+
+\emph{Case B: $g(t')$ is a square.} Then $\varepsilon(P;R,Q)=\chi\bigl(\frac{(s-s')^2\,t}{s'(t'-s')(t-s')}\bigr)
+=\chi(ts')\chi\bigl((t-s')(t'-s')\bigr)=-\chi\bigl((t-s')(t'-s')\bigr)$. The ratio to $\varepsilon(R;P,Q)$ is
+$-\chi((t-s')(s-t))\chi(-1)=\chi((t-s')(s-t))$. In Case B, $\chi((t-s)(t-s'))=-1$ (the other point is the square),
+so $\chi((s-t)(t-s'))=\chi(-1)\cdot(-1)=1$, and the ratio is $1$.
+\end{proof}
+
+We use the following consequence of theorems of Carlitz \cite{Carlitz} and McConnel \cite{McConnel} (also proved by
+Bruen and Levinger \cite{BL}), in the form stated in \cite[p.~145, ``Result'']{BSW}:
+
+\begin{theorem}[Carlitz--McConnel]\label{thm:CM}
+Let $q=p^m$ be odd and $f:\GF(q)\to\GF(q)$ a function such that $(f(x)-f(y))/(x-y)$ is a nonsquare for all
+$x\ne y$. Then $f(x)=a+bx^{p^j}$ with $0\le j<m$ and $b$ a nonsquare.
+\end{theorem}
+
+\begin{theorem}\label{thm:red2}
+Let $q\equiv3\pmod4$ and let $\Pi$ be a BSW partition of $\PG(1,q)$. The following are equivalent:
+(a) $\Pi$ is standard; (b) every triple of pairs of $\Pi$ is positive; (c) some $R\in\Pi$ lies only in positive
+triples of $\Pi$. Moreover, for $\Pi=\Pi_\psi$ and $R=\{0,\infty\}$, condition (c) is exactly \eqref{eq:E}.
+\end{theorem}
+
+\begin{proof}
+Any three pairs of a BSW partition form a compatible triple.
+
+(a)$\Rightarrow$(b). Let $\Pi$ be the orbit set of a fixed-point-free involution $\sigma$, and $\{R,P,Q\}\subseteq\Pi$.
+Take $g$ with $gR=\{0,\infty\}$. Then $g\sigma g^{-1}$ swaps $0,\infty$, so it is $x\mapsto n/x$ with $n$ a nonsquare
+(proof of Lemma~\ref{lem:dict}(ii)), and $gP=\{s,n/s\}$, $gQ=\{t,n/t\}$ with $s,t$ squares. So
+$\varepsilon=\chi\bigl((s-t)(\tfrac ns-\tfrac nt)\bigr)=\chi\bigl(-n(s-t)^2/(st)\bigr)=\chi(-1)\chi(n)=1$.
+
+(b)$\Rightarrow$(c) is trivial.
+
+(c)$\Rightarrow$(a). By Lemma~\ref{lem:pgl}(i) and Lemma~\ref{lem:eps} we may move $R$ to $\{0,\infty\}$, so
+$\Pi=\Pi_\psi$. The pairs of $\Pi$ other than $\{0,\infty\}$ are $\{s,\psi(s)\}$ with $s$ a square, so positivity of all
+triples through $\{0,\infty\}$ is exactly \eqref{eq:E}; this also proves the last sentence of the theorem. Define
+$f(0)=0$ and $f(x)=1/\psi(x)$ for $x\ne0$. We show that $D(x,y)=(f(x)-f(y))/(x-y)$ is a nonsquare for all $x\ne y$; as
+$D$ is symmetric we may order $x,y$. Recall $\chi(1/z)=\chi(z)$, and that $\chi(\psi(s)\psi(t))=\chi(st)=1$ for squares
+$s,t$.
+\begin{itemize}
+\item $y=0$: $D=1/(x\psi(x))$, and $\chi(x\psi(x))=-1$.
+\item $y=\psi(x)$: $D=\dfrac{1/\psi(x)-1/x}{x-\psi(x)}=\dfrac1{x\psi(x)}$, a nonsquare.
+\item $x=s$, $y=t$ distinct squares: $D=\dfrac{\psi(t)-\psi(s)}{\psi(s)\psi(t)(s-t)}$, so
+$\chi(D)=\chi(-1)\chi\bigl((s-t)(\psi(s)-\psi(t))\bigr)=-1$ by \eqref{eq:E}.
+\item $x=\psi(s)$, $y=\psi(t)$ with $s\ne t$ squares: $f(x)=1/s$, $f(y)=1/t$, so
+$D=\dfrac{t-s}{st(\psi(s)-\psi(t))}$ and $\chi(D)=\chi(-1)\chi\bigl((s-t)(\psi(s)-\psi(t))\bigr)=-1$.
+\item $x=s$ a square, $y=\psi(t)$ with $t\ne s$ a square: $D=\dfrac{t-\psi(s)}{t\,\psi(s)\,(s-\psi(t))}$, so
+$\chi(D)=\chi(t\psi(s))\,\chi\bigl((t-\psi(s))(s-\psi(t))\bigr)=-\chi\bigl((t-\psi(s))(s-\psi(t))\bigr)$. By the hypothesis
+of Conjecture~1 the product $(s-t)(s-\psi(t))(\psi(s)-t)(\psi(s)-\psi(t))$ is a nonsquare, and by \eqref{eq:E}
+$(s-t)(\psi(s)-\psi(t))$ is a square, so $(s-\psi(t))(\psi(s)-t)$ is a nonsquare and
+$\chi\bigl((t-\psi(s))(s-\psi(t))\bigr)=\chi(-1)\cdot(-1)=1$. Hence $\chi(D)=-1$.
+\end{itemize}
+These cases cover all $x\ne y$, since every nonzero element is a square $s$ or a nonsquare $\psi(s)$. By
+Theorem~\ref{thm:CM}, $f(x)=a+bx^{p^j}$ with $b$ a nonsquare and $0\le j<m$; $f(0)=0$ gives $a=0$, so
+$\psi(x)=1/(bx^{p^j})$ for $x\ne0$. Then $x=\psi(\psi(x))=b^{p^j-1}x^{p^{2j}}$ for all $x\ne0$. Taking $x=1$ gives
+$b^{p^j-1}=1$, hence $x^{p^{2j}}=x$ on $\GF(q)$, so $m\mid 2j$. As $m$ is odd, $m\mid j$, and $0\le j<m$ gives $j=0$.
+So $\psi(x)=n/x$ with $n=1/b$ a nonsquare, and $\Pi$ is standard by Lemma~\ref{lem:dict}(ii).
+\end{proof}
+
+\begin{corollary}\label{cor:few}
+If a BSW partition $\Pi$ ($q\equiv3\pmod4$) has fewer than $(q+1)/6$ negative triples, it is standard.
+\end{corollary}
+
+\begin{proof}
+The negative triples contain at most $3\cdot\#\{\text{negative triples}\}<(q+1)/2=|\Pi|$ pairs, so some $R\in\Pi$ lies
+in no negative triple. Apply Theorem~\ref{thm:red2}(c).
+\end{proof}
+
+\begin{proof}[Proof of Theorem~\ref{thm:red}]
+By Lemma~\ref{lem:dict}, $\psi(x)=n/x$ iff $\Pi_\psi$ is standard, and by Theorem~\ref{thm:red2} (with
+$R=\{0,\infty\}$) this holds iff \eqref{eq:E} holds. The remaining statements are Lemma~\ref{lem:eps},
+Theorem~\ref{thm:red2} and Corollary~\ref{cor:few}.
+\end{proof}
+
+\begin{remark}
+In the non-standard partitions for $q\le31$ the property fails massively: for every choice of $R$, between
+$39\%$ and $100\%$ of the pairs $\{P,Q\}$ give negative triples (for $q=31$, $50$ or $66$ of the $105$). Standard
+partitions have none. Numerically, $\varepsilon$ was also checked to be symmetric on $12{,}000$ random compatible
+triples for $q\in\{19,43,103,227\}$, and the equivalence of \eqref{eq:E}, the nonsquare property of $f$, and
+standardness was checked on all $244$ BSW partitions containing $\{0,\infty\}$ for the primes $q\equiv3\pmod4$
+with $7\le q\le43$.
+\end{remark}
+
+\section{Computer-assisted proof of Theorem~\ref{thm:main}}
+
+\subsection{Reduction to finitely many searches}
+
+Fix $q\equiv3\pmod4$ and a primitive element $g$. For an odd key $K\le(q-1)/2$, let $\mathcal S_K$ be the set of
+BSW partitions $\Pi$ that contain $\{0,\infty\}$ and $\{1,g^K\}$ and in which every two pairs have key
+$\ge K$.
+
+\begin{lemma}\label{lem:orderly}
+\begin{enumerate}
+\item[(i)] Every BSW partition of $\PG(1,q)$ is $\PGL(2,q)$-equivalent to a member of $\mathcal S_K$ for some
+$K$.
+\item[(ii)] If $q\equiv3\pmod 4$, then $\mathcal S_1$ contains exactly one standard partition, namely the orbits
+of $x\mapsto g/x$, and $\mathcal S_K$ contains no standard partition for $K>1$.
+\end{enumerate}
+Consequently, if every $\mathcal S_K$ consists of standard partitions only, then Conjecture~1 holds for $q$.
+\end{lemma}
+
+\begin{proof}
+(i) Let $K$ be the least key over all configurations of two pairs of $\Pi$, attained by $\{P,Q\}$. By
+Lemma~\ref{lem:classes}, $\{\{0,\infty\},\{1,g^K\}\}$ also has key $K$. By Lemma~\ref{lem:pgl}(ii) some $h$ maps
+$\{P,Q\}$ to it. By Lemma~\ref{lem:pgl}(i), $h\Pi$ is a BSW partition with the same multiset of keys, so
+$h\Pi\in\mathcal S_K$.
+
+(ii) Standard partitions are BSW partitions (Lemma~\ref{lem:stdbsw}). A standard partition realises key $1$ (Lemma~\ref{lem:classes}, applied after moving one of its pairs to
+$\{0,\infty\}$; keys are invariant). So its least key is $1$, and it lies in no $\mathcal S_K$ with $K>1$. A
+standard partition in $\mathcal S_1$ is the orbit set of an involution having $\{0,\infty\}$ and $\{1,g\}$ as
+orbits. By Lemma~\ref{lem:pgl}(iii) this involution is unique, and $x\mapsto g/x$ is one.
+
+For the final claim, let $\psi$ satisfy the hypotheses of Conjecture~1. Then $\Pi_\psi$ is a BSW partition
+(Lemma~\ref{lem:dict}). By (i), $h\Pi_\psi\in\mathcal S_K$ for some $h$ and $K$. By assumption $h\Pi_\psi$ is
+standard, so $\Pi_\psi$ is standard by Lemma~\ref{lem:pgl}(i), and $\psi(x)=n/x$ by Lemma~\ref{lem:dict}(ii).
+\end{proof}
+
+\subsection{The search}
+
+For a member of $\mathcal S_K$, every pair other than $\{0,\infty\}$ and $\{1,g^K\}$ is $\{s,t\}$ with $s$ a
+nonzero square, $s\ne1$, and $t$ a nonsquare, $t\ne g^K$ (Lemma~\ref{lem:dict}(i)). So a member of
+$\mathcal S_K$ is a perfect matching between the $N=(q-3)/2$ ``rows'' $s$ and the $N$ ``columns'' $t$ such that:
+\begin{itemize}
+\item each chosen pair $\{s,t\}$ is \emph{allowed}: its configurations with $\{0,\infty\}$ and with
+$\{1,g^K\}$ have key $\ge K$ (keys are only defined for compatible configurations, so this includes
+compatibility);
+\item every two chosen pairs form a configuration of key $\ge K$.
+\end{itemize}
+We enumerated all such matchings exhaustively by backtracking, for every prime power $q\equiv3\pmod4$ with
+$43\le q\le1050$ and every odd key $K\le(q-1)/2$. Each member of $\mathcal S_K$ is reported exactly once. By
+Lemma~\ref{lem:orderly}(i) this covers every BSW partition up to $\PGL(2,q)$, so the results below prove
+Theorem~\ref{thm:main}.
+
+\subsection{Verification}
+
+The following independent checks were performed.
+\begin{enumerate}
+\item \textbf{Positive control.} By Lemma~\ref{lem:orderly}(ii), the search must report the standard partition
+$x\mapsto g/x$ in run $K=1$. It did so for every $q$ in the range.
+\item \textbf{Output check.} Every reported partition was re-checked by an independent program. It rebuilds
+$\psi$ from the printed pairs, checks that $\psi$ is an involution of $\GF(q)^*$ with $\chi(\psi(x))=-\chi(x)$,
+checks the four-factor condition of Conjecture~1 for all $x,y$ directly, and decides whether $x\psi(x)$ is
+constant. For prime powers it also re-verifies that the printed polynomial defines a field.
+\item \textbf{Independent re-run by SAT.} For every prime $q\equiv3\pmod4$ with $43\le q\le131$, all BSW
+partitions containing $\{0,\infty\}$ were also enumerated with a SAT encoding that uses no keys and no other
+symmetry reduction: one Boolean variable per pair $\{s,t\}$, exactly-one constraints on rows and columns, a
+binary clause for every incompatible configuration, and blocking clauses to enumerate all models. This finds
+exactly $(q-1)/2$ partitions, all standard. Together with Lemma~\ref{lem:dict} this proves the conjecture for
+these $q$ without using the search program.
+\item \textbf{Small $q$.} For $q\le31$, the set of partitions containing $\{0,\infty\}$ found by the search was
+reproduced by two further independent enumerations (including $q=27$). The $q\le31$ with non-standard partitions
+are exactly $7,11,19,23,27,31$ (Table~\ref{tab:small}).
+\item \textbf{Third method.} An independently written exhaustive search, with its own field construction, using
+no logarithms, no keys and no orderly reduction (it fixes only $\{0,\infty\}$ and branches over the partner of
+$1$), reproduces the main search for all $29$ prime powers $q\equiv3\pmod4$ with $43\le q\le311$ (including
+$243$): exactly $(q-1)/2$ BSW partitions containing $\{0,\infty\}$, all standard. This re-proves
+Theorem~\ref{thm:main} for these $q$ independently of the main search, and for $q\le31$ its counts equal
+Table~\ref{tab:small}.
+\end{enumerate}
+For $311<q\le700$ the result rests on the main search, supported by the positive control and the output check.
+
+\begin{table}[ht]
+\centering
+\caption{All BSW partitions of $\PG(1,q)$ for $7\le q\le 31$, $q\equiv 3\pmod 4$ ($q=3$ is trivial: the two pairs always form the standard partition). ``Containing $\{0,\infty\}$'' is the
+count found by the independent exhaustive enumerations (SAT for prime $q$, brute force otherwise); ``total'' is $q$ times that count, since each partition has $(q+1)/2$ of the $q(q+1)/2$ pairs and,
+by transitivity, every pair lies in equally many partitions.}
+\label{tab:small}
+\begin{tabular}{rrrrr}
+\toprule
+$q$ & containing $\{0,\infty\}$ & of which standard & total & non-standard total\\
+\midrule
+7 & 5 & 3 & 35 & 14\\
+11 & 12 & 5 & 132 & 77\\
+19 & 54 & 9 & 1026 & 855\\
+23 & 121 & 11 & 2783 & 2530\\
+27 & 104 & 13 & 2808 & 2457\\
+31 & 31 & 15 & 961 & 496\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Results}
+
+For every prime power $q\equiv3\pmod4$ with $43\le q\le1050$ (Table~\ref{tab:big}), every run $K$ completed.
+Run $K=1$ reported exactly one partition, the standard one, and every other run reported none. The output check
+confirmed every output. By Lemma~\ref{lem:orderly} this proves Theorem~\ref{thm:main}. The range
+$700<q\le1050$ was computed by a distributed version of the same search (Section~\ref{sec:dist}). All source
+code, logs and computed outputs are available upon request.
+
+\begin{longtable}{rrr}
+\caption{Searches for $43\le q\le1050$: number of runs $K$ (all of them, $(q+1)/4$) and partitions reported (all
+runs together; in every case the single standard partition).}\label{tab:big}\\
+\toprule
+$q$ & runs & reported\\
+\midrule
+\endfirsthead
+\toprule
+$q$ & runs & reported\\
+\midrule
+\endhead
+43 & 11 & 1 \\
+47 & 12 & 1 \\
+59 & 15 & 1 \\
+67 & 17 & 1 \\
+71 & 18 & 1 \\
+79 & 20 & 1 \\
+83 & 21 & 1 \\
+103 & 26 & 1 \\
+107 & 27 & 1 \\
+127 & 32 & 1 \\
+131 & 33 & 1 \\
+139 & 35 & 1 \\
+151 & 38 & 1 \\
+163 & 41 & 1 \\
+167 & 42 & 1 \\
+179 & 45 & 1 \\
+191 & 48 & 1 \\
+199 & 50 & 1 \\
+211 & 53 & 1 \\
+223 & 56 & 1 \\
+227 & 57 & 1 \\
+239 & 60 & 1 \\
+243 & 61 & 1 \\
+251 & 63 & 1 \\
+263 & 66 & 1 \\
+271 & 68 & 1 \\
+283 & 71 & 1 \\
+307 & 77 & 1 \\
+311 & 78 & 1 \\
+331 & 83 & 1 \\
+343 & 86 & 1 \\
+347 & 87 & 1 \\
+359 & 90 & 1 \\
+367 & 92 & 1 \\
+379 & 95 & 1 \\
+383 & 96 & 1 \\
+419 & 105 & 1 \\
+431 & 108 & 1 \\
+439 & 110 & 1 \\
+443 & 111 & 1 \\
+463 & 116 & 1 \\
+467 & 117 & 1 \\
+479 & 120 & 1 \\
+487 & 122 & 1 \\
+491 & 123 & 1 \\
+499 & 125 & 1 \\
+503 & 126 & 1 \\
+523 & 131 & 1 \\
+547 & 137 & 1 \\
+563 & 141 & 1 \\
+571 & 143 & 1 \\
+587 & 147 & 1 \\
+599 & 150 & 1 \\
+607 & 152 & 1 \\
+619 & 155 & 1 \\
+631 & 158 & 1 \\
+643 & 161 & 1 \\
+647 & 162 & 1 \\
+659 & 165 & 1 \\
+683 & 171 & 1 \\
+691 & 173 & 1 \\
+719 & 180 & 1 \\
+727 & 182 & 1 \\
+739 & 185 & 1 \\
+743 & 186 & 1 \\
+751 & 188 & 1 \\
+787 & 197 & 1 \\
+811 & 203 & 1 \\
+823 & 206 & 1 \\
+827 & 207 & 1 \\
+839 & 210 & 1 \\
+859 & 215 & 1 \\
+863 & 216 & 1 \\
+883 & 221 & 1 \\
+887 & 222 & 1 \\
+907 & 227 & 1 \\
+911 & 228 & 1 \\
+919 & 230 & 1 \\
+947 & 237 & 1 \\
+967 & 242 & 1 \\
+971 & 243 & 1 \\
+983 & 246 & 1 \\
+991 & 248 & 1 \\
+1019 & 255 & 1 \\
+1031 & 258 & 1 \\
+1039 & 260 & 1 \\
+\bottomrule
+\end{longtable}
+
+\subsection{Distributed computation}\label{sec:dist}
+
+The range $700<q\le1050$ consists of the $25$ primes $q\equiv3\pmod4$ from $719$ to $1039$; there is no proper
+prime power $q\equiv3\pmod4$ in this range. A distributed version of the same search computed all runs $K$ in
+this range, and the merged outputs passed the output check described above. All $25$ values of $q$ are complete,
+and each has exactly one solution, the standard one (Table~\ref{tab:big}).
+
+\section{Remarks}
+
+\begin{itemize}
+\item \emph{The sporadic case $q=31$.} The $496$ non-standard partitions for $q=31$ form one $\PGL(2,31)$-orbit
+(stabiliser of order $60$). Each of them meets $15$ elliptic
+involutions in $4$ pairs and $30$ in $2$ pairs. So every involution contains at most $4$ of its $16$ pairs, far
+below the bound $(28+2\sqrt{31})/4\approx9.78$ of Theorem~\ref{thm:stab2}.
+\end{itemize}
+
+\section{Statistics of the compatibility relation}\label{sec:stats}
+
+These experiments are heuristic; no theorem depends on them.
+\begin{itemize}
+\item \emph{Raw search tree.} Fix $\{0,\infty\}$, order the squares $s_1,\dots,s_m$ ($m=(q-1)/2$), and let $N_d$ be
+the number of tuples of distinct nonsquares $(n_1,\dots,n_d)$ with $\{s_i,n_i\}$ pairwise compatible. Positive
+control: $N_m$ equals the counts of Table~\ref{tab:small}
+($5,12,54,121,31$ for $q=7,\dots,31$). If compatibilities were independent fair coins,
+$\mathbb E N_d=m(m-1)\cdots(m-d+1)\,2^{-\binom d2}$. Over $3$ square orders per $q$, the ratio $(N_d-m)/\mathbb E N_d$
+at $d=4$ is $1.21$ for $q=43$, $1.06$ for $q=107$, $1.02$ for $q=227$ and $1.017$ for $q=503$. Non-standard branches
+die $0$ to $7$ levels below the depth where $\mathbb E N_d<1$. The deep survivors are near-standard: for $q=103$ and
+$d\ge12$ almost all have every pair but one in a single involution, the situation of Theorem~\ref{thm:stab2}.
+\item \emph{Local independence.} For $k=3,4$ random disjoint pairs ($4\cdot10^6$ samples per $q$), the
+$2^{\binom k2}$ compatibility patterns are uniform within sampling error for $q\ge10007$ ($\chi^2$ $p$-values
+$0.3$--$0.94$), and nearly so for $q=2003,5003$ (smallest $p$-value $0.014$). For smaller $q$ the deviations are of order $1/q$, not $1/\sqrt q$. For example, the probability
+that two pairs are compatible is about $\frac12+\frac1{2q}$. The sign $\varepsilon$ of
+Lemma~\ref{lem:eps} is positive on random compatible triples with frequency $0.496$--$0.503$ for
+$q\in\{43,227,503,1031,5003,20011\}$, but $0.492$ for $q=103$ ($p=0.001$).
+\item \emph{The exceptions are symmetric, not random.} The independent-coin expectation of the number of BSW
+partitions containing $\{0,\infty\}$ is $m!\,2^{-\binom m2}$: $0.75$, $0.12$, $5\cdot10^{-6}$, $10^{-9}$ and
+$3\cdot10^{-20}$ for $q=7,11,19,23,31$. The observed numbers of non-standard ones are $2,7,45,110,16$. Every
+non-standard $\PGL(2,q)$-orbit has a nontrivial stabiliser, of order $24$; $60,24$; $8$; $8,12$; $60$.
+\item \emph{Sharpness of Theorem~\ref{thm:stab2}.} The maximum number of shared pairs between a non-standard BSW
+partition and an elliptic involution is $2,3,6,4,4$ for $q=7,11,19,23,31$. The thresholds are $2.32$, $3.66$, $6.18$,
+$7.40$ and $9.78$, so the theorem is sharp for $q=7,11,19$. In the proof, the maximum of $N$ over $\ell$ equals
+$\lfloor(q-3+2\sqrt q)/4\rfloor$ for every tested prime $q\in\{43,59,83,103,131,163,199,251,307\}$.
+\end{itemize}
+
+\section{Approaches that failed}\label{sec:failed}
+
+\begin{itemize}
+\item \emph{Forcing a large common involution.} Theorem~\ref{thm:stab2} would prove the conjecture for all
+large $q$, given a lemma that some elliptic involution shares more than $(q-3+2\sqrt q)/4$ pairs with $\Pi$. Pure
+counting gives only $\sum_z t_z=\sum_z t_z(t_z-1)=(q^2-1)/4$, where $t_z$ is the number of pairs of $\Pi$ in the
+involution $z$. This is compatible with all $t_z\le2$, so it gives nothing.
+\item \emph{Parity linearisation.} For $q\equiv3\pmod4$, two pairs $P,Q$ are compatible iff an odd number of the four
+pairs $(x,y)\in P\times Q$ have $\chi([y,x])=1$, by \eqref{eq:prod}. This turns the condition into linear algebra over
+$\GF(2)$, but we found no way to exploit it.
+\item \emph{Odd character sums.} $\Pi$ is BSW iff each $g_P(x)=\chi([x,a][x,a'])$ (bracket convention, so
+$\infty$ is allowed; $P=\{a,a'\}$) is odd under the pairing
+outside $P$. Hence for every three pairs, $\sum_{x\in\PG(1,q)}g_P(x)g_Q(x)g_R(x)=0$ (the terms for $x$ and its partner cancel),
+i.e.\ the genus-$2$ curve $y^2=f_Pf_Qf_R$ has Frobenius trace $0$ (checked on $10{,}112$ triples). We found no way to turn these identities into a contradiction.
+\item \emph{The parity count of \cite{BSW}.} For $q\equiv1\pmod4$, BSW prove the analogue of \eqref{eq:E} by counting,
+for the $5$-set $X=\{0,a,b,c,d\}$ formed by $0$ and two pairs, the vertices joined to exactly $i$ points of $X$ in the
+(strongly regular) Paley graph. For $q\equiv3\pmod4$ we repeated the count in the Paley tournament ($z\to u$ iff
+$\chi(u-z)=1$). For $v\notin X$ let $i(v)$ be the number of $u\in X$ with $\chi(u-v)=1$, and $x_i$ the number of $v$
+with $i(v)=i$. Since any two vertices have exactly $(q-3)/4$ common in-neighbours (a direct character-sum
+computation), one gets $\sum x_i=q-5$, $\sum ix_i=5\frac{q-1}2-10$ and $\sum\binom i2x_i=10\frac{q-3}4-S$, where $S$ is the
+number of transitive triples of the sub-tournament on $X$. Compatibility gives, as in \cite{BSW}, $\sum_{i\text{ odd}}x_i=
+\frac{q-5}2$. Hence $2x_3+4x_4+8x_5=\frac{3q-5}2-S$, so $S$ must be even. We verified this identity on actual partitions
+($q=19,23,31,43$). But enumerating all $32$ sub-tournaments allowed by the
+known arcs and the compatibility of the two pairs shows that $S$ is always even. So
+the count gives no information.
+\item \emph{Probabilistic and pseudorandom counting.} First- and second-moment counts with character sums bound
+the size of families of pairwise compatible pairs (Cauchy--Schwarz with Lemma~\ref{lem:hasse} gives roughly
+$k^2\lesssim q^2/2+2kq$). But standard partitions are such families of the largest possible size $(q+1)/2$, so no
+bound valid for all compatible families can exclude non-standard ones. The first moments of
+Section~\ref{sec:stats} are heuristics only.
+\item \emph{Delsarte's linear programme.} $\PGL(2,q)$ acting on the $2$-subsets of $\PG(1,q)$ gives a commutative,
+multiplicity-free association scheme with $(q+3)/2$ classes (identity, ``meet'', and the cross-ratio classes
+$\{c,1/c\}$). A BSW partition is a clique avoiding the square classes and ``meet'', and it is orthogonal to the
+point-incidence module. For $q=43,47$ the resulting LP leaves every nonsquare class free over $[0,\approx5.5]$, so it
+does not force the inner distribution of the standard partition. Moreover,
+standard partitions are Delsarte-slack, vanishing only on the point module, while the non-standard examples are
+tight (for $q=31$ on $7$ eigenspaces). So Delsarte equality cannot single out the standard partitions.
+\item \emph{A heuristic obstruction.} Non-standard partitions exist for $q=7,11,19,23,27,31$, which meet every
+residue class $q\equiv3,7,11,15\pmod{16}$. So an argument that uses only identities valid for all $q$ in one of
+these classes modulo $16$ (exact counts, parity) cannot prove Conjecture~1. This suggests, but does not prove, that a
+proof must use the size of $q$, for instance through Weil-type bounds as in Theorem~\ref{thm:stab2}.
+\end{itemize}
+
+\begin{thebibliography}{9}
+\bibitem{BSW} A.~Blokhuis, \'A.~Seress, H.~A.~Wilbrink, Characterization of complete exterior sets of conics,
+\emph{Combinatorica} 12 (1992) 143--147.
+\bibitem{Carlitz} L.~Carlitz, A theorem on permutations in a finite field, \emph{Proc. Amer. Math. Soc.} 11 (1960)
+456--459.
+\bibitem{McConnel} R.~McConnel, Pseudo-ordered polynomials over a finite field, \emph{Acta Arith.} 8 (1963) 127--151.
+\bibitem{BL} A.~A.~Bruen, B.~Levinger, A theorem on permutations of a finite field, \emph{Canad. J. Math.} 25 (1973)
+1060--1065.
+\bibitem{Silverman} J.~H.~Silverman, \emph{The Arithmetic of Elliptic Curves}, 2nd ed., Springer, 2009.
+\end{thebibliography}
+
+\end{document}

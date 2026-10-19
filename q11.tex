@@ -1,0 +1,47 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+\newcommand{\tx}[1]{\texttt{#1}}
+
+\title{NSUCRYPTO 2026, Round 2\\Problem 11: ``Who is here?''}
+\date{}
+\author{Jacob Lu, Raymond Ouyang, Ruiyang Ye}
+\begin{document}
+\maketitle
+
+\section*{Answer}
+
+\begin{quote}
+The 17 labels scattered over the picture, reassembled, spell
+\begin{center}
+\Large \tx{SALTYKOV-SHCHEDRIN 200!}
+\end{center}
+\end{quote}
+
+\section{Reassembling the message}
+
+This is an anagram embedded in the picture, carrying 17 small labels placed on specific objects of a village
+scene. In row order, left to right, they read
+
+\[
+\tx{SH}\quad \tx{RI}\quad \tx{CH}\quad \tx{S}\quad \tx{K}\quad \tx{O}\quad
+\tx{2}\quad \tx{T}\quad \tx{0}\quad \tx{L}\quad \tx{ED}\quad \tx{N}\quad
+\tx{!}\quad \tx{0}\quad \tx{A}\quad \tx{Y}\quad \tx{V-}.
+\]
+
+The combination match
+\tx{SALTYKOV-SHCHEDRIN 200!} exactly --- 22 characters either way, with nothing
+missing and nothing left over. 
+
+\section{Who is here}
+
+Saltykov-Shchedrin (1826--1889) is here. The picture is a crop of Rotraut
+Susanne Berner's \emph{Sommer-Wimmelbuch}, with the 17 labels added on top.
+
+\end{document}

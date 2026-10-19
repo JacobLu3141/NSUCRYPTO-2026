@@ -11,6 +11,6 @@
 
 # Allow only PDFs in the base folder
 !/*.pdf
-
+!/*.tex
 # Allow this file itself
 !.gitignore

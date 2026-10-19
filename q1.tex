@@ -1,0 +1,129 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+\newcommand{\tx}[1]{\texttt{#1}}
+
+\title{NSUCRYPTO 2026, Round 2\\Problem 1: ``An ancient civilization''}
+\date{}
+\author{Jacob Lu, Raymond Ouyang, Ruiyang Ye}
+\begin{document}
+\maketitle
+
+\section*{Answer}
+
+\begin{itemize}
+  \item \textbf{Key:} \tx{SATOSHINAKAMOTO}
+  \item \textbf{Cipher:} the 102 letters of Line~3, read across the seven tablets as one stream, form a repeating-key Vigen\`ere cipher that preserves case.
+  \item \textbf{Message:}
+\end{itemize}
+
+\begin{quote}
+The hawk was having a breakfast of cookies and sea buckthorn tea but was
+caught by artificial intelligence and put in a cage.
+\end{quote}
+
+\section{The archive is a blockchain}
+
+Each tablet has four lines. We read them as the fields of a block in a
+Bitcoin-style chain:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Line & Content & Role \\
+\midrule
+1 & $0,1,\dots,6$ & block index \\
+2 & 64 zeros on tablet~0, empty elsewhere & previous-block hash \\
+3 & 16 letters, with 6 on the last tablet & block data \\
+4 & a decimal integer & nonce \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Several features support this reading:
+
+\begin{itemize}
+  \item A string of 64 hexadecimal zeros is the
+  previous-block hash of Bitcoin's genesis block, written as 64 hex characters.
+  Only block~0 can carry it.
+  \item ``The past is the key to the present. The
+  present is the key to the future'' is conceptually analogous with hash chaining: each block
+  commits to the one before it.
+  \item The seven
+  sectors are the seven blocks, and the 64 stars are the 64 hex characters of
+  a hash.
+  \item A proof-of-work search that
+  needs $b$ leading zero bits takes a geometrically distributed number of
+  attempts with mean~$2^b$. The seven numbers fit this exactly:
+  \begin{itemize}
+    \item The mean is $16\,617\,838 \approx 2^{23.99}$;
+    \item The maximum-likelihood difficulty under the geometric model is
+    $23.99$ bits (95\% CI $23.1$--$25.3$);
+    \item A Kolmogorov--Smirnov test against an exponential distribution with
+    mean $2^{24}$ gives $p=0.33$, while means $2^{20}$ and $2^{28}$ are
+    rejected ($p<0.001$);
+    \item The geometric model beats a uniform one by a likelihood ratio of
+    about $14:1$.
+  \end{itemize}
+  Because target of 24 zero bits is four zero characters in base~64, which made this a clue corresponding to ``the first four galaxies''.
+\end{itemize}
+
+The archive is therefore a model of the Bitcoin blockchain. The ``key'' that
+the inscription points to is the name of its creator, \tx{SATOSHINAKAMOTO}.
+
+\section{Decryption}
+
+The tablets are shown side by side, with the first \tx{L} being capitalized. So Line~3 is read straight across as a
+single stream of $6\cdot 16+6=102$ letters:
+\begin{center}
+\tx{Lhxvsdsjachmjbby | aufwhssactatvcgk | bskhvqsoanivylhh | ffamnbetiolqsuzv}\\
+\tx{lignrdirwvwslbbl | ltyiqezqxofdiilp | vnckgq}
+\end{center}
+
+Number the letters $A=0,\dots,Z=25$, and let $k_0k_1\dots k_{14}$ be the key
+\tx{SATOSHINAKAMOTO}. Each ciphertext letter $c_i$ decrypts to
+\[
+p_i \equiv c_i - k_{i \bmod 15} \pmod{26}, \qquad i=0,1,\dots,101,
+\]
+with case kept: the capital \tx{L} at the start becomes the capital \tx{T}.
+
+The key has length 15, while the tablets are 16 letters wide. It therefore
+runs continuously across the tablets and does not restart at each one.
+Grouped into key periods:
+
+\begin{center}
+\renewcommand{\arraystretch}{1.15}
+\begin{tabular}{@{}r>{\ttfamily}l>{\ttfamily}l>{\ttfamily}l@{}}
+\toprule
+Letters & \normalfont Ciphertext & \normalfont Key & \normalfont Plaintext \\
+\midrule
+1--15   & Lhxvsdsjachmjbb & SATOSHINAKAMOTO & Thehawkwashavin \\
+16--30  & yaufwhssactatvc & SATOSHINAKAMOTO & gabreakfastofco \\
+31--45  & gkbskhvqsoanivy & SATOSHINAKAMOTO & okiesandseabuck \\
+46--60  & lhhffamnbetiolq & SATOSHINAKAMOTO & thornteabutwasc \\
+61--75  & suzvlignrdirwvw & SATOSHINAKAMOTO & aughtbyartifici \\
+76--90  & slbblltyiqezqxo & SATOSHINAKAMOTO & alintelligencea \\
+91--102 & fdiilpvnckgq    & SATOSHINAKAMO   & ndputinacage \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Example: $c_0=\tx{L}=11$ and $k_0=\tx{S}=18$, so $p_0\equiv 11-18\equiv 19
+\pmod{26}$, which is \tx{T}.
+
+
+\noindent
+With spaces added it reads:
+The hawk was having a breakfast of cookies and sea buckthorn tea but was
+caught by artificial intelligence and put in a cage.
+
+All 102 letters decrypt to grammatical English, which confirms the key.
+
+\end{document}

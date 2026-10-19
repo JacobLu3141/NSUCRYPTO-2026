@@ -1,0 +1,152 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{array}
+\usepackage{hyperref}
+
+\newcommand{\tx}[1]{\texttt{#1}}
+\newcommand{\vs}{\textvisiblespace}
+\newcommand{\comment}[1]{}
+\title{NSUCRYPTO 2026, Round 2\\Problem 8: ``Crypto room''}
+\date{}
+\author{Jacob Lu, Raymond Ouyang, Ruiyang Ye}
+\begin{document}
+\maketitle
+
+\section*{Answer}
+
+\begin{quote}
+``Cryptography is typically bypassed, not penetrated.'' --- Adi Shamir
+\end{quote}
+
+\begin{itemize}
+  \item \textbf{Cipher:} the 17 hexadecimal labels in the room are textbook
+  RSA ciphertexts. Each one encrypts 4 ASCII bytes, read as a big-endian
+  integer.
+  \item \textbf{Public key:} $e=65537$ and
+  \[
+  N = 151\,456\,309\,706\,371 = \tx{0x89bfab89fe83} = p\,q,
+  \qquad p = 5\,041\,523,\quad q = 30\,041\,777 .
+  \]
+  \item \textbf{Private exponent:}
+  $d = e^{-1} \bmod (p-1)(q-1) = 77\,487\,966\,921\,153$.
+\end{itemize}
+
+\section{The labels}
+
+Every label has 12 hex digits, so it is a 48-bit integer. Taken together,
+the labels use every one of the 16 hex digits in positions 2 through 12. The
+first digit,
+however, is always one of \tx{0}--\tx{8}, and the largest label is
+\tx{8649d2897de8} $\approx 1.48\cdot 10^{14}$. If the 17 labels were uniform
+48-bit values, the first digit of every label would lie in $\{0,\dots,8\}$
+with probability
+\[
+(9/16)^{17} \approx 6\cdot 10^{-5}.
+\]
+The labels therefore look like residues modulo a common $N$ slightly larger
+than $1.48\cdot 10^{14}$. The number $65537$ is the standard RSA public
+exponent, and Shamir is the ``S'' of RSA. Together these point to RSA with a
+47-bit modulus. The modulus itself is not written anywhere in the picture.
+
+\section{Recovering the modulus}
+
+The picture shows the birth and death years of two other cryptographers on the
+wall: 1523--1596 for Vigen\`ere and 1777--1855 for Gauss. These are the clue to
+the modulus: its primes carry the birth years in their last four digits,
+\[
+p = 5\,041\,523 \equiv 1523 \pmod{10^4}, \qquad
+q = 30\,041\,777 \equiv 1777 \pmod{10^4}.
+\]
+ With this structure, $N$ can be recovered
+without guessing any plaintext.
+
+From the previous section, $N$ lies between the largest label and
+$9\cdot 16^{11}$, a window of width about $1.07\cdot 10^{13}$. Write
+\[
+p = 10^4 a + 1523, \qquad q = 10^4 b + 1777.
+\]
+Any genuine RSA modulus has primes of comparable magnitude, so we search
+$p$ from $10^6$ up to $\sqrt{9\cdot 16^{11}} \approx 1.26\cdot 10^7$. This
+leaves 183 prime candidates for $p$. For each of them, $q = N/p$ is forced
+into the window $(\max_i c_i)/p \le q \le 9\cdot 16^{11}/p$, so $b$ ranges
+over only 44\,406 values in total, of which 6\,222 make $q$ prime.
+
+For each of the 6\,222 candidate pairs $(p,q)$ we compute
+$d = e^{-1} \bmod (p-1)(q-1)$ (when the inverse exists) and decrypt one
+label. Under a wrong modulus the result looks uniform in $[0,N)$, so the
+chance that it is below $2^{32}$ and consists of four printable ASCII bytes
+(codes 32--126) is about
+\[
+\frac{2^{32}}{N}\cdot\Bigl(\frac{95}{256}\Bigr)^4 \approx 5.4\cdot 10^{-7}.
+\]
+A second label makes a false survivor astronomically unlikely. Exactly one
+pair survives:
+\[
+p = 5\,041\,523, \qquad q = 30\,041\,777, \qquad
+N = 151\,456\,309\,706\,371.
+\]
+Checking all 17 labels confirms it: every label decrypts to printable bytes
+and re-encrypts to itself. The whole search takes a couple of seconds.
+
+\comment{
+\paragraph*{Remark (alternative: known-plaintext recovery).}
+The modulus can also be recovered without the years, at the price of
+guessing a fragment of the plaintext. If $c = m^e \bmod N$, then $N$ divides
+the integer $m^e - c$, so two correctly guessed plaintext--ciphertext pairs
+give
+\[
+N \;\Big|\; \gcd\!\left(m_1^{\,e} - c_1,\; m_2^{\,e} - c_2\right),
+\]
+and in practice this gcd equals $N$ or a small multiple of it. Guessing that
+the hidden text contains Shamir's best-known line, and trying block sizes of
+3 to 6 bytes, every alignment, and all ordered pairs of labels, the pair
+\[
+m_1 = \tx{"ptog"},\ c_1 = \tx{0037e3e277d0}, \qquad
+m_2 = \tx{"raph"},\ c_2 = \tx{5bf4286560fd}
+\]
+(4-byte blocks, starting 3 characters into ``Cryptography'') gives the same
+$N = 151\,456\,309\,706\,371$ directly.
+}
+\section{Decryption}
+
+With $d$ as above, each label $c$ decrypts to $m = c^d \bmod N$, written as
+4 bytes. In the table, \vs\ marks a space.
+
+\begin{center}
+\renewcommand{\arraystretch}{1.1}
+\begin{tabular}{@{}>{\ttfamily}l >{\ttfamily}l@{}}
+\toprule
+\normalfont Label & \normalfont Plaintext \\
+\midrule
+69cac604f3f6 & "Cry \\
+0037e3e277d0 & ptog \\
+5bf4286560fd & raph \\
+7a78ae829dee & y\vs is \\
+1160d891335b & \vs typ \\
+25aa4a80579b & ical \\
+465d1f5ae113 & ly\vs b \\
+3f268417e1bd & ypas \\
+751fb3515b44 & sed, \\
+44a174ad7278 & \vs not \\
+660301648837 & \vs pen \\
+7a8d796a70ab & etra \\
+5c40bf50d20b & ted. \\
+3932ff60773e & "\vs -\vs \\
+8649d2897de8 & Adi\vs \\
+1d5a29213b82 & Sham \\
+788f5bae6242 & ir\vs\vs \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent
+Joined in this order, the chunks read
+\begin{center}
+\tx{"Cryptography is typically bypassed, not penetrated." - Adi Shamir}
+\end{center}
+
+\end{document}

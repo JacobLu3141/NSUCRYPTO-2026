@@ -1,0 +1,156 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{hyperref}
+
+\usepackage{array}
+
+\newcommand{\tx}[1]{\texttt{#1}}
+
+\DeclareMathOperator{\lcm}{lcm}
+
+\title{NSUCRYPTO 2026, Round 2\\Problem 5: ``Grandchildren''}
+\date{}
+\author{Jacob Lu, Raymond Ouyang, Ruiyang Ye}
+\begin{document}
+\maketitle
+
+\section*{Answer}
+
+\[
+\text{Asya } 4,\qquad \text{Vanya } 6,\qquad \text{Sonya } 12 \qquad(\text{key } 4\text{-}6\text{-}12),
+\]
+with house number $H=192$ and Grandma at $G=46$, on the same (even) side of a street with odd/even numbering.
+The only ingredients beyond the text are a model of Sonya's walk and of the street (Section~\ref{sec:cond}); no
+assumption about the children's ages is added. The answer is the only candidate that survives every one of the
+24 model settings we tested.
+
+\section{Formalisation}
+
+Let $a$, $v$, $s$ be the ages of Asya, Vanya and Sonya (positive integers), $H$ their house number, and
+$G=\overline{a\,v}$ Grandma's house number. Sonya passes $N=6s$ houses on the way. The value of $N$ depends on
+how the street is numbered:
+\begin{itemize}
+  \item \textbf{Consecutive numbering} ($1,2,3,\dots$ along the walk): $N=|G-H|-1$.
+  \item \textbf{Odd/even numbering} (both houses on the same side, as is usual on Russian streets):
+  $G\equiv H\pmod 2$ and $N=\tfrac12|G-H|-1$.
+\end{itemize}
+
+\section{All conditions}\label{sec:cond}
+
+\begin{center}
+\begin{tabular}{@{}cll@{}}
+\toprule
+& Condition & Source \\
+\midrule
+A & $a\mid H$, $v\mid H$, $s\mid H$, $G\neq H$; Sonya passes $6s$ houses (either numbering) & text \\
+B & Vanya has math homework, so he is of school age: $v\ge 6$ & text \\
+C & Sonya's 25-minute walk gives a realistic plot width (see below) & text + model \\
+D & The street has a realistic length (see below) & model \\
+E & The three are children: $1\le a,v,s\le 17$ & text \\
+F & The key (ages of Asya, Vanya, Sonya written in order) has at least 4 digits & lock safety \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\paragraph{Conditions C and D.} Sonya walks for $1500$\,s. We assume typical walking speeds by age: $0.90$\,m/s
+up to age~4, $1.05$ at 5--6, $1.15$ at 7--9, $1.25$ at 10--12, and $1.35$\,m/s from~13. She passes $6s$ houses,
+so one plot is
+\[
+w(s)=\frac{\text{speed}(s)\cdot 1500\ \text{s}}{6s+1}
+\]
+wide. C asks that $w(s)$ lie in a realistic range. The plot width also turns house numbers into distances: the
+farthest house lies about $\max(G,H)$ plots from the start of the street under consecutive numbering, or
+$\max(G,H)/2$ plots under odd/even numbering. D asks that this length stay below a cap.
+
+\paragraph{Condition F.} The ages form the digital key to Grandma's house. A 3-digit code (only 1000 combinations)
+is not safe for a house lock, so we exclude every triple in which all three ages are single digits.
+
+\paragraph{Model settings.} C and D depend on modelling parameters, so we evaluate them in 24 settings: speeds
+scaled by $\times0.8$, $\times1.0$ or $\times1.2$; plot widths of 8--40\,m or 6--50\,m; and street caps of 3, 5,
+8 or 12\,km. A candidate's score is the number of settings it survives, and the answer is the candidate that
+survives the most.
+
+\paragraph{Method.} We enumerated every $(a,v,s)$ with ages $1$--$17$ and every $H\le10^5$; since
+$|G-H|\le2(6\cdot17+1)$ and $G\le1717$, this covers all solutions. Condition~A alone has 127 solutions with
+consecutive numbering and 170 with odd/even numbering. We then applied B--F to all of them in one pass (script
+\tx{one\_shot.py}).
+
+\section{Result}
+
+Forty candidates survive at least one setting. Those surviving at least 18 of the 24:
+
+\begin{center}
+\begin{tabular}{@{}clrrrrr@{}}
+\toprule
+$(a,v,s)$ & numbering & $H$ & $G$ & $w(s)$ & street & settings \\
+\midrule
+$(4,6,12)$   & odd/even    & 192 & 46  & 25.7\,m & 2.5\,km & \textbf{24/24} \\
+$(2,7,14)$   & consecutive & 112 & 27  & 23.8\,m & 2.7\,km & 22/24 \\
+$(2,9,10)$   & consecutive & 90  & 29  & 30.7\,m & 2.8\,km & 22/24 \\
+$(4,6,16)$   & odd/even    & 240 & 46  & 20.9\,m & 2.5\,km & 22/24 \\
+$(5,8,15)$   & odd/even    & 240 & 58  & 22.3\,m & 2.7\,km & 22/24 \\
+$(1,11,11)$  & consecutive & 44  & 111 & 28.0\,m & 3.1\,km & 20/24 \\
+$(1,10,14)$  & odd/even    & 280 & 110 & 23.8\,m & 3.3\,km & 20/24 \\
+$(1,15,9)$   & odd/even    & 225 & 115 & 31.4\,m & 3.5\,km & 20/24 \\
+$(1,17,17)$  & odd/even    & 323 & 117 & 19.7\,m & 3.2\,km & 20/24 \\
+$(11,8,12)$  & odd/even    & 264 & 118 & 25.7\,m & 3.4\,km & 20/24 \\
+$(3,14,12)$  & odd/even    & 168 & 314 & 25.7\,m & 4.0\,km & 18/24 \\
+$(16,6,14)$  & odd/even    & 336 & 166 & 23.8\,m & 4.0\,km & 18/24 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent ($w(s)$ and the street length are given at speed $\times1.0$.) In the central setting (speed
+$\times1.0$, plots 8--40\,m, cap 5\,km) the twelve candidates above all survive; the model settings are what
+separate them. Only $(4,6,12)$ survives all 24.
+
+\paragraph{The answer in detail.} For $(a,v,s)=(4,6,12)$ there is exactly one solution: $H=192=16\cdot\lcm(4,6,12)$,
+divisible by 4, 6 and 12; $G=\overline{4\,6}=46$; both are even, so the houses are on the same side; and Sonya
+passes $\tfrac12(192-46)-1=72=6\cdot12$ houses. Vanya is of school age (B), and the key 4-6-12 has four digits (F).
+At age~12 Sonya walks at 1.25\,m/s, so one plot is $1.25\cdot1500/73$\,m wide, and the farthest house is
+$192/2=96$ plots away:
+
+\begin{center}
+\begin{tabular}{@{}crrcc@{}}
+\toprule
+speed & $w(12)$ & street & plots 8--40\,m, caps 3/5/8/12\,km & plots 6--50\,m, caps 3/5/8/12\,km \\
+\midrule
+$\times0.8$ & 20.5\,m & 1.97\,km & \checkmark\ \checkmark\ \checkmark\ \checkmark & \checkmark\ \checkmark\ \checkmark\ \checkmark \\
+$\times1.0$ & 25.7\,m & 2.47\,km & \checkmark\ \checkmark\ \checkmark\ \checkmark & \checkmark\ \checkmark\ \checkmark\ \checkmark \\
+$\times1.2$ & 30.8\,m & 2.96\,km & \checkmark\ \checkmark\ \checkmark\ \checkmark & \checkmark\ \checkmark\ \checkmark\ \checkmark \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\noindent Its plot widths lie in the middle of the allowed range, and even its longest street is below the
+strictest cap of 3\,km. 
+
+\section{What each condition contributes}
+
+For each specific condition dropped:
+
+\begin{center}
+\begin{tabular}{@{}lrl@{}}
+\toprule
+Dropped & survivors & top score \\
+\midrule
+none            & 40 & $(4,6,12)$ alone at 24/24 \\
+F (key length)  & 53 & $(4,6,12)$ ties with $(1,6,9)$ (key 1-6-9) at 24/24 \\
+B (homework)    & 96 & 14 candidates tie at 24/24 \\
+C (plot width)  & 47 & $(4,6,12)$ ties with $(1,14,7)$ at 24/24 \\
+D (street)      & 58 & 27 candidates tie at 24/24 \\
+C and D         & 85 & all 85 tie: no model, no answer \\
+\bottomrule
+\end{tabular}
+\end{center}
+This shows that every condition is neccessary here to pinpoint a good candidate in our model.
+\section*{Conclusion}
+
+The digital key is \textbf{4-6-12}: Asya~4, Vanya~6, Sonya~12, living at number 192, with Grandma's house number 46.
+The only modelling ingredients we assumed are the speed
+table, the plot widths and the street caps, giving the unique candidate that passes our model.
+\end{document}
