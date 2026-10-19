@@ -1,0 +1,33 @@
+\documentclass{article}
+\usepackage{Package485}
+
+\title{NSUCRYPTO 2026, Round 2\\Problem 12: ``A quantum cipher''}
+\date{}
+\author{Jacob Lu, Raymond Ouyang, Ruiyang Ye}
+\begin{document}
+\maketitle
+\section*{Solution}
+There are two primary issues with the encryption scheme: the key is recoverable, and the ciphertext can be tampered without being noticed. We discuss these two issues below:
+\begin{itemize}
+      \item Firstly, we can recover the key with a chosen plaintext attack. Consider the string $(|0\rangle|+\rangle)^n$. We have that
+            \begin{itemize}
+                  \item applying $I \otimes I$ to $|0\rangle|+\rangle$ gives
+                        $(I|0\rangle)\otimes(I|+\rangle)=|0\rangle|+\rangle$,
+                  \item applying $X \otimes X$ to $|0\rangle|+\rangle$ gives
+                        $(X|0\rangle)\otimes(X|+\rangle)=|1\rangle|+\rangle$,
+                  \item applying $Y \otimes Y$ to $|0\rangle|+\rangle$ gives
+                        $(Y|0\rangle)\otimes(Y|+\rangle)=(i|1\rangle)\otimes(-i|-\rangle)=|1\rangle|-\rangle$, and
+                  \item applying $Z \otimes Z$ to $|0\rangle|+\rangle$ gives
+                        $(Z|0\rangle)\otimes(Z|+\rangle)=|0\rangle|-\rangle$.
+            \end{itemize}
+            This yields an orthonormal basis of possible qubit pairs in the ciphertext, with the first qubit in the computational basis and the second in the Hadamard basis. So for any integer $j \in [1, n]$, we have that $P_j$ is uniquely determined by $(P_j|x_j\rangle) \otimes (P_j|y_j\rangle)$, as above. By measuring both qubits in their respective basis, we can compute each $P_j$, and concatenate the $P_j$'s to retrieve the key, as (un)desired.
+      \item Secondly, even without recovering the key, we can tamper the ciphertext in such a way that the receiver of the decrypted plaintext cannot (without outside information) determine that the ciphertext was tampered with. Notice that $X \otimes X$ either commutes or anti-commutes with all four Pauli gates; representing them as matrices, we get
+            \begin{itemize}
+                  \item $XI=\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}1&0\\0&1\end{pmatrix}=\begin{pmatrix}0&1\\1&0\end{pmatrix}=IX$,
+                  \item $XX=\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}0&1\\1&0\end{pmatrix}=\begin{pmatrix}1&0\\0&1\end{pmatrix}=XX$,
+                  \item $XY=\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}0&-i\\i&0\end{pmatrix}=\begin{pmatrix}i&0\\0&-i\end{pmatrix}=iZ=-YX$, and
+                  \item $XZ=\begin{pmatrix}0&1\\1&0\end{pmatrix}\begin{pmatrix}1&0\\0&-1\end{pmatrix}=\begin{pmatrix}0&-1\\1&0\end{pmatrix}=-iY=-ZX$.
+            \end{itemize}
+            As a result, we can apply $X \otimes X$ to every qubit pair in the ciphertext, and we claim that this cannot be noticed upon decryption. For any integer $j \in [1, n]$, we have that the $j$-th qubit pair in the ciphertext is $(P_j|x_j\rangle) \otimes (P_j|y_j\rangle)$, so applying $X \otimes X$ gives us $$X(P_j|x_j\rangle) \otimes X(P_j|y_j\rangle) = \pm P_j(X|x_j\rangle) \otimes \pm P_j(X|y_j\rangle),$$ which upon decryption yields $$\pm (X|x_j\rangle) \otimes \pm (X|y_j\rangle).$$ This means that the $j$-th qubit pair in the plaintext could have had $\pm X$ applied to it prior to encryption, so the receiver of the corrupted plaintext cannot tell that it is corrupted, as (un)desired.
+\end{itemize}
+\end{document}
