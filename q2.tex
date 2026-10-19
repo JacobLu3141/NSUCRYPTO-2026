@@ -14,16 +14,16 @@ $$\begin{aligned}
         366889387421265645976611543461126584379143432478252583277,
     \end{aligned}$$
 $$b = 1886408344076331.$$
-Since $a-b = 76q$, taking $\gcd(a-b, n)$ gives
+Since $a-b$ and $a + b$ are $2kq$ and $2p$ in some order, taking $\gcd(a-b, n)$ gives a factor of either $p$ or $q$:
 $$\begin{aligned}
-        p = 5371913032918545150453546759644100290036528026488118747504127980955667212008882131139210037771002431 \\
+        r = 5371913032918545150453546759644100290036528026488118747504127980955667212008882131139210037771002431 \\
         83444693710632822988305771730563292189570773034954253473.
     \end{aligned}$$
-from which we can take $q = n // p$ to get
+from which we can take $s = n // r$ to get
 $$\begin{aligned}
-        q = 7068306622261243619017824683742237223732273719063314141452799974941667384222213330446328997067108462 \\
+        s = 7068306622261243619017824683742237223732273719063314141452799974941667384222213330446328997067108462 \\
         940061759350431881425075943823201213020692887411820129,
-    \end{aligned}$$ For a quick sanity check, we have $$p - 76q = -1886408344076331 = -b.$$ So we have found our factors $p$ and $q$. Miller-Rabin primality testing quickly verifies that $p$ and $q$ are both prime, and Euclidean algorithm quickly verifies that $\gcd(e, (p-1)(q-1)) = 1$. \\ \\
+    \end{aligned}$$ We have $$r - 76s = -1886408344076331 = -b,$$ so let $p = r$ and $q = s$. Miller-Rabin primality testing quickly verifies that $p$ and $q$ are both prime, and Euclidean algorithm quickly verifies that $\gcd(e, (p-1)(q-1)) = 1$. \\ \\
 Computing $d = e^{-1} \pmod {(p-1)(q-1)}$, we get $$\begin{aligned}
         M_1 = C_1 = 1637043872144093466435287811903759041129761501636697214610611653620470403944965542903540790527330904 \\
         3785875342369910360046449436234775353426537267125578687127428642866243460483864484858549973816372092             \\
