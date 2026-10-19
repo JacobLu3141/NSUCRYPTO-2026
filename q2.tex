@@ -1,25 +1,28 @@
 \documentclass{article}
 \usepackage{Package485}
 
-\title{NSUCRYPTO 2026, Round 2\\Problem 12: ``A quantum cipher''}
+\title{NSUCRYPTO 2026, Round 2\\Problem 2: ``Cryptanalysis of RSA''}
 \date{}
 \author{Jacob Lu, Raymond Ouyang, Ruiyang Ye}
 \begin{document}
 \maketitle
 \section*{Solution}
-Without loss of generality, let $n = pq$ for positive integers $p > q > 1$. We wish to find some value $k$ such that $p = kq \pm b$ for some small value $b \ge 0$. In order for this, we need to look for solutions $(a, b) \in (\mathbb{N} \cup \{0\})^2$ to $$n = (kq\pm b)q = kq^2 \pm bq \implies 4kn = (2kq \pm b)^2 - b^2 \implies a^2 - 4kn = b^2,$$ where $a = 2kq \pm b = kq + p$ and $a^2 - 4kn$ must be a perfect square. \\ \\ A brute force search reveals that $b$ is exceptionally small at $k = 76$, where
+Without loss of generality, let $n = pq$ for positive integers $p > q > 1$. We wish to find some value $k$ such that $p = kq \pm b$ for some small value $b \ge 0$. In order for this, we need to look for solutions $(a, b) \in (\mathbb{N} \cup \{0\})^2$ to $$n = (kq\pm b)q = kq^2 \pm bq \implies 4kn = (2kq \pm b)^2 - b^2 \implies a^2 - 4kn = b^2,$$ where $a = 2kq \pm b = kq + p$ and $a^2 - 4kn$ must be a perfect square. \\ \\ For $k = 1, 2, \dots$, set $a_k = \lceil \sqrt{4kn} \rceil$ and test whether $a_k^2 - 4kn$ is a perfect square. In other words, run a single iteration of Fermat search on $4kn$ for each $k$. If $p = kq \pm b$ with $b^2 < 2\sqrt{4kn}$, then $a = p + kq = a_k$ and $a^2 - 4kn = b^2$, so the test succeeds.
+The first $k$ for which this works is $k = 76$, where
 $$\begin{aligned}
         a = 1074382606583709030090709351928820058007305605297623749500825596191133442401776426227842007554200486 \\
-        366889387421265645976611543461126584379143432478252583277
-    \end{aligned}$$ and $$b = 1886408344076331.$$
+        366889387421265645976611543461126584379143432478252583277,
+    \end{aligned}$$
+$$b = 1886408344076331.$$
 Since $a-b = 76q$, taking $\gcd(a-b, n)$ gives
-$$\begin{aligned}
-        q = 7068306622261243619017824683742237223732273719063314141452799974941667384222213330446328997067108462 \\
-        940061759350431881425075943823201213020692887411820129,
-    \end{aligned}$$ from which we can take $p = n // r$ to get
 $$\begin{aligned}
         p = 5371913032918545150453546759644100290036528026488118747504127980955667212008882131139210037771002431 \\
         83444693710632822988305771730563292189570773034954253473.
+    \end{aligned}$$
+from which we can take $q = n // p$ to get
+$$\begin{aligned}
+        q = 7068306622261243619017824683742237223732273719063314141452799974941667384222213330446328997067108462 \\
+        940061759350431881425075943823201213020692887411820129,
     \end{aligned}$$ For a quick sanity check, we have $$p - 76q = -1886408344076331 = -b.$$ So we have found our factors $p$ and $q$. Miller-Rabin primality testing quickly verifies that $p$ and $q$ are both prime, and Euclidean algorithm quickly verifies that $\gcd(e, (p-1)(q-1)) = 1$. \\ \\
 Computing $d = e^{-1} \pmod {(p-1)(q-1)}$, we get $$\begin{aligned}
         M_1 = C_1 = 1637043872144093466435287811903759041129761501636697214610611653620470403944965542903540790527330904 \\
